@@ -142,27 +142,26 @@ export default function Expenses() {
             </div>
             <p className="text-gray-500 mt-2 md:mt-4 md:text-lg font-medium">Tracking and adding records for the selected date.</p>
           </div>
-          <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row items-start md:items-center justify-between md:justify-start gap-4 md:gap-8 w-full xl:w-auto">
-             <div className="flex items-center gap-4">
-               <div className="bg-orange-50 p-3 rounded-xl text-orange-600">
-                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+          <div className="bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-gray-100 grid grid-cols-2 md:flex md:flex-row items-center justify-between md:justify-start gap-4 md:gap-8 w-full xl:w-auto">
+             <div className="flex flex-col md:flex-row items-start md:items-center gap-3 md:gap-4">
+               <div className="bg-orange-50 p-2.5 md:p-3 rounded-xl text-orange-600 self-start md:self-center shrink-0">
+                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" className="md:w-6 md:h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
                </div>
                <div>
-                 <p className="text-[11px] md:text-sm font-bold text-gray-400 uppercase tracking-widest">Daily Outflow</p>
-                 <p className="text-xl md:text-2xl font-black text-gray-900 leading-none mt-1 shadow-sm">₹{dailyTotal.toLocaleString()}</p>
+                 <p className="text-[10px] md:text-sm font-bold text-gray-400 uppercase tracking-widest">Daily Outflow</p>
+                 <p className="text-lg md:text-2xl font-black text-gray-900 leading-none mt-1 shadow-sm truncate max-w-[80px] md:max-w-none">₹{dailyTotal.toLocaleString()}</p>
                </div>
              </div>
 
              <div className="hidden md:block w-px h-10 bg-gray-100"></div>
-             <div className="md:hidden w-full h-px bg-gray-100"></div>
 
-             <div className="flex items-center gap-4">
-               <div className="bg-purple-50 p-3 rounded-xl text-purple-600">
-                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+             <div className="flex flex-col md:flex-row items-start md:items-center gap-3 md:gap-4 border-l border-gray-100 md:border-none pl-4 md:pl-0">
+               <div className="bg-purple-50 p-2.5 md:p-3 rounded-xl text-purple-600 self-start md:self-center shrink-0">
+                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" className="md:w-6 md:h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                </div>
                <div>
-                 <p className="text-[11px] md:text-sm font-bold text-gray-400 uppercase tracking-widest">Monthly Outflow</p>
-                 <p className="text-xl md:text-2xl font-black text-purple-900 leading-none mt-1 shadow-sm">₹{monthlyTotal.toLocaleString()}</p>
+                 <p className="text-[10px] md:text-sm font-bold text-gray-400 uppercase tracking-widest">Monthly Outflow</p>
+                 <p className="text-lg md:text-2xl font-black text-purple-900 leading-none mt-1 shadow-sm truncate max-w-[80px] md:max-w-none">₹{monthlyTotal.toLocaleString()}</p>
                </div>
              </div>
           </div>
@@ -323,10 +322,10 @@ export default function Expenses() {
                        <h3 className="text-lg md:text-xl font-bold text-gray-700">No Expenses Found</h3>
                     </div>
                   ) : (
-                    <div className="w-full">
-                      <table className="w-full text-left border-collapse block md:table pb-4 md:pb-0">
-                        <thead className="hidden md:table-header-group bg-gray-50/80 sticky top-0 z-10 backdrop-blur-md">
-                          <tr className="text-gray-500 text-[10px] md:text-xs uppercase tracking-wider border-b border-gray-100">
+                    <div className="w-full overflow-x-auto">
+                      <table className="w-full text-left border-collapse">
+                        <thead className="bg-gray-50/80 sticky top-0 z-10 backdrop-blur-md">
+                          <tr className="text-gray-500 text-xs uppercase tracking-wider border-b border-gray-100">
                             <th className="p-4 md:p-5 font-bold">Date</th>
                             <th className="p-4 md:p-5 font-bold">Details</th>
                             <th className="p-4 md:p-5 font-bold hidden sm:table-cell">Mode</th>
@@ -334,7 +333,7 @@ export default function Expenses() {
                             <th className="p-4 md:p-5 font-bold text-center">Action</th>
                           </tr>
                         </thead>
-                        <tbody className="block md:table-row-group divide-y-0 md:divide-y divide-gray-100 flex-col px-4 md:px-0 pt-4 md:pt-0 gap-4 flex md:block">
+                        <tbody className="divide-y divide-gray-100">
                           {data.map((item, index) => {
                             const isLast = index === data.length - 1;
                             const createdDate = item.createdAt ? new Date(item.createdAt) : new Date();
@@ -348,39 +347,34 @@ export default function Expenses() {
                               <tr 
                                 key={item._id} 
                                 ref={isLast ? lastElementRef : null}
-                                className="block md:table-row group hover:bg-orange-50/20 bg-white md:bg-transparent transition-colors border border-gray-100 md:border-transparent rounded-2xl md:rounded-none p-5 md:p-0 shadow-sm md:shadow-none mb-4 md:mb-0"
+                                className="group hover:bg-orange-50/20 bg-white md:bg-transparent transition-colors"
                               >
-                                <td className="flex md:table-cell justify-between items-center md:p-5 text-gray-500 font-bold text-xs md:text-sm whitespace-nowrap mb-2 md:mb-0 border-b md:border-none border-gray-50 pb-3 md:pb-0">
-                                  <span className="md:hidden text-xs font-bold text-gray-400 uppercase tracking-wider">Date Logged</span>
+                                <td className="p-4 md:p-5 text-gray-500 font-bold text-sm whitespace-nowrap">
                                   {displayDate}
                                 </td>
-                                <td className="flex md:table-cell justify-between items-center md:p-5 mb-2 md:mb-0">
-                                  <span className="md:hidden text-xs font-bold text-gray-400 uppercase tracking-wider">Details</span>
-                                  <div className="text-right md:text-left">
-                                    <p className="font-extrabold text-gray-900 text-lg md:text-base">{item.title}</p>
+                                <td className="p-4 md:p-5">
+                                    <p className="font-extrabold text-gray-900 text-base">{item.title}</p>
                                     <span className={`sm:hidden mt-0.5 inline-block text-[10px] font-bold uppercase ${item.type === 'cash' ? 'text-orange-500' : 'text-blue-500'}`}>
                                       {item.type}
                                     </span>
-                                  </div>
                                 </td>
-                                <td className="p-4 md:p-5 hidden sm:table-cell">
+                                <td className="p-4 md:p-5 hidden sm:table-cell whitespace-nowrap">
                                   <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold uppercase ${item.type === 'cash' ? 'bg-orange-50 text-orange-600' : 'bg-blue-50 text-blue-600'}`}>
                                     {item.type === 'cash' ? '💵' : '📱'} {item.type}
                                   </span>
                                 </td>
-                                <td className="flex md:table-cell justify-between items-center md:p-5 mb-3 md:mb-0">
-                                  <span className="md:hidden text-xs font-bold text-gray-400 uppercase tracking-wider">Amount</span>
-                                  <p className="font-black text-2xl md:text-lg text-red-600 tracking-tight">
+                                <td className="p-4 md:p-5 whitespace-nowrap">
+                                  <p className="font-black text-lg text-red-600 tracking-tight">
                                     -₹{item.amount}
                                   </p>
                                 </td>
-                                <td className="block md:table-cell p-0 md:p-5 text-right md:text-center mt-3 md:mt-0 pt-3 md:pt-0 border-t md:border-none border-gray-50">
+                                <td className="p-4 md:p-5 text-center">
                                    <button
                                     onClick={() => handleDelete(item._id)}
-                                    className="text-gray-400 hover:text-white bg-gray-50 hover:bg-red-500 p-3 md:p-2 rounded-xl transition-colors focus:outline-none opacity-100 md:opacity-0 group-hover:opacity-100 inline-block border border-gray-200 md:border-none"
+                                    className="text-gray-400 hover:text-white bg-gray-50 md:bg-transparent hover:bg-red-500 p-2 rounded-xl transition-colors focus:outline-none opacity-100 md:opacity-0 group-hover:opacity-100 inline-block"
                                     title="Delete entry"
                                   >
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="md:w-5 md:h-5"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
                                   </button>
                                 </td>
                               </tr>

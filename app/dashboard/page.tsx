@@ -51,21 +51,21 @@ export default function Dashboard() {
   return (
     <div className="pb-20">
       <div className="max-w-7xl mx-auto p-4 md:p-8">
-        
-        {/* Header section (Removed) */}
-        <div className="pt-12 md:pt-20"></div>
+
+        {/* Header Spacer */}
+        <div className="pt-24 md:pt-28"></div>
 
         {/* TWO-COLUMN GRID: Left Main (Launchers) | Right Side (Widget) */}
         <div className="flex flex-col lg:flex-row gap-8">
-          
+
           {/* LEFT COLUMN: Deep Routing Matrix */}
           <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6 h-fit">
-            
+
             {/* Launch Node: Inventory */}
             <Link href="/inventory" className="bg-white p-6 md:p-8 rounded-[2rem] shadow-sm border border-gray-100 flex flex-col justify-between transition-all hover:-translate-y-1 hover:shadow-lg hover:border-blue-200 group active:scale-[0.98]">
               <div className="flex justify-between items-start mb-6">
                 <span className="text-4xl bg-blue-50 p-3 rounded-2xl">📦</span>
-                <span className="text-blue-600 font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">Open <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+                <span className="text-blue-600 font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">Open <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg></span>
               </div>
               <div>
                 <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">Module</p>
@@ -80,9 +80,9 @@ export default function Dashboard() {
 
             {/* Launch Node: Orders */}
             <Link href="/orders" className="bg-white p-6 md:p-8 rounded-[2rem] shadow-sm border border-gray-100 flex flex-col justify-between transition-all hover:-translate-y-1 hover:shadow-lg hover:purple-blue-200 group active:scale-[0.98]">
-               <div className="flex justify-between items-start mb-6">
+              <div className="flex justify-between items-start mb-6">
                 <span className="text-4xl bg-purple-50 p-3 rounded-2xl">📋</span>
-                <span className="text-purple-600 font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">Open <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+                <span className="text-purple-600 font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">Open <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg></span>
               </div>
               <div>
                 <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">Module</p>
@@ -99,7 +99,7 @@ export default function Dashboard() {
             <Link href="/credit" className="bg-white p-6 md:p-8 rounded-[2rem] shadow-sm border border-gray-100 flex flex-col justify-between transition-all hover:-translate-y-1 hover:shadow-lg hover:border-red-200 group active:scale-[0.98]">
               <div className="flex justify-between items-start mb-6">
                 <span className="text-4xl bg-red-50 p-3 rounded-2xl">⚠️</span>
-                <span className="text-red-600 font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">Open <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+                <span className="text-red-600 font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">Open <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg></span>
               </div>
               <div>
                 <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">Module</p>
@@ -114,9 +114,9 @@ export default function Dashboard() {
 
             {/* Launch Node: Expenses */}
             <Link href="/expenses" className="bg-white p-6 md:p-8 rounded-[2rem] shadow-sm border border-gray-100 flex flex-col justify-between transition-all hover:-translate-y-1 hover:shadow-lg hover:border-orange-200 group active:scale-[0.98]">
-               <div className="flex justify-between items-start mb-6">
+              <div className="flex justify-between items-start mb-6">
                 <span className="text-4xl bg-orange-50 p-3 rounded-2xl">💸</span>
-                <span className="text-orange-600 font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">Open <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+                <span className="text-orange-600 font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">Open <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg></span>
               </div>
               <div>
                 <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">Module</p>
@@ -131,30 +131,30 @@ export default function Dashboard() {
 
             {/* Launch Node: Closing Till */}
             <Link href="/closing" className="bg-white p-6 md:p-8 rounded-[2rem] shadow-sm border border-gray-100 flex flex-col justify-between transition-all hover:-translate-y-1 hover:shadow-lg hover:border-emerald-200 group active:scale-[0.98]">
-               <div className="flex justify-between items-start mb-6">
+              <div className="flex justify-between items-start mb-6">
                 <span className="text-4xl bg-emerald-50 p-3 rounded-2xl">🏦</span>
-                <span className="text-emerald-600 font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">Open <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+                <span className="text-emerald-600 font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">Open <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg></span>
               </div>
               <div>
                 <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">Module</p>
                 <h2 className="text-2xl font-extrabold text-gray-800 mb-2">Daily Closing</h2>
                 <div className="bg-emerald-50 rounded-xl p-3 inline-block">
-                   {data.latestClosing ? (
-                     <p className="text-md font-black text-emerald-700 leading-none">
-                        ₹{data.latestClosing.cash} <span className="text-xs text-emerald-600 font-bold ml-1">CASH</span>
-                     </p>
-                   ) : (
-                     <p className="text-sm font-bold text-gray-500">Till Empty</p>
-                   )}
+                  {data.latestClosing ? (
+                    <p className="text-md font-black text-emerald-700 leading-none">
+                      ₹{data.latestClosing.cash} <span className="text-xs text-emerald-600 font-bold ml-1">CASH</span>
+                    </p>
+                  ) : (
+                    <p className="text-sm font-bold text-gray-500">Till Empty</p>
+                  )}
                 </div>
               </div>
             </Link>
 
             {/* Launch Node: Active Reminders */}
             <Link href="/reminders" className="bg-white p-6 md:p-8 rounded-[2rem] shadow-sm border border-gray-100 flex flex-col justify-between transition-all hover:-translate-y-1 hover:shadow-lg hover:border-indigo-200 group active:scale-[0.98]">
-               <div className="flex justify-between items-start mb-6">
+              <div className="flex justify-between items-start mb-6">
                 <span className="text-4xl bg-indigo-50 p-3 rounded-2xl">⚡</span>
-                <span className="text-indigo-600 font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">Open <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+                <span className="text-indigo-600 font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">Open <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg></span>
               </div>
               <div>
                 <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">Module</p>
@@ -172,7 +172,7 @@ export default function Dashboard() {
           {/* RIGHT COLUMN: Reminders Inbox Widget */}
           <div className="w-full lg:w-[400px] flex flex-col h-full mt-6 lg:mt-0">
             <div className="bg-white rounded-3xl shadow-sm border border-gray-100 flex-1 overflow-hidden flex flex-col h-full min-h-[500px]">
-              
+
               {/* Widget Header */}
               <div className="p-6 bg-gray-50/50 border-b border-gray-100 flex justify-between items-center">
                 <div>
@@ -203,7 +203,7 @@ export default function Dashboard() {
                             Pending
                           </span>
                           <span className="text-xs font-bold text-gray-500 bg-white px-2 py-1 rounded-md shadow-sm border border-gray-100">
-                             {new Date(task.targetDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric'})}
+                            {new Date(task.targetDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                           </span>
                         </div>
                         <p className="font-bold text-gray-900 border-l-2 border-orange-400 pl-2 text-md mt-3 leading-snug">
@@ -217,9 +217,9 @@ export default function Dashboard() {
 
               {/* Widget Footer */}
               <div className="p-4 border-t border-gray-100 bg-gray-50/50 text-center">
-                 <Link href="/reminders" className="text-blue-600 font-bold text-sm hover:text-blue-800 transition-colors w-full inline-block py-2">
-                   Manage all tasks →
-                 </Link>
+                <Link href="/reminders" className="text-blue-600 font-bold text-sm hover:text-blue-800 transition-colors w-full inline-block py-2">
+                  Manage all tasks →
+                </Link>
               </div>
 
             </div>
