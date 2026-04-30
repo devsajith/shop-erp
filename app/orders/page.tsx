@@ -16,10 +16,10 @@ export default function OrdersPage() {
     const [products, setProducts] = useState<Product[]>([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [filterCategory, setFilterCategory] = useState("All");
-    const categories = ["All", "Bakery", "Grocery", "Vegetable"];
+    const categories = ["All", "Stationary", "Grocery", "Veg"];
 
     // State to hold quantities: Record<productId, quantity>
-    const [orderMap, setOrderMap] = useState<Record<string, number>>({});
+    const [orderMap, setOrderMap] = useState<Record<string, number | "">>({});
 
     const fetchProducts = async () => {
         const res = await fetch("/api/products");
@@ -43,12 +43,37 @@ export default function OrdersPage() {
         });
     };
 
-    const handleQuantityChange = (productId: string, quantity: number) => {
-        if (quantity < 1) quantity = 1;
-        setOrderMap((prev) => ({
-            ...prev,
-            [productId]: quantity,
-        }));
+    const handleQuantityChange = (productId: string, value: string) => {
+        if (value === "") {
+            setOrderMap((prev) => ({ ...prev, [productId]: "" }));
+            return;
+        }
+        const quantity = parseInt(value, 10);
+        if (!isNaN(quantity) && quantity >= 1) {
+            setOrderMap((prev) => ({
+                ...prev,
+                [productId]: quantity,
+            }));
+        }
+    };
+
+    const handleIncrement = (productId: string) => {
+        setOrderMap((prev) => {
+            const current = prev[productId];
+            const val = typeof current === "number" ? current : 0;
+            return { ...prev, [productId]: val + 1 };
+        });
+    };
+
+    const handleDecrement = (productId: string) => {
+        setOrderMap((prev) => {
+            const current = prev[productId];
+            const val = typeof current === "number" ? current : 1;
+            if (val > 1) {
+                return { ...prev, [productId]: val - 1 };
+            }
+            return prev;
+        });
     };
 
     const exportAsImage = async () => {
@@ -99,6 +124,13 @@ export default function OrdersPage() {
 
     return (
         <div className="min-h-screen bg-gray-50 text-gray-900 font-sans pb-32 relative">
+            <style dangerouslySetInnerHTML={{__html: `
+                input[type=number]::-webkit-inner-spin-button, 
+                input[type=number]::-webkit-outer-spin-button { 
+                    -webkit-appearance: none; 
+                    margin: 0; 
+                }
+            `}} />
             <div className="max-w-7xl mx-auto p-4 md:p-8">
 
                 {/* Header & Main Controls */}
@@ -200,19 +232,30 @@ export default function OrdersPage() {
 
                                         {/* Qty Input */}
                                         {isSelected && (
-                                            <div
-                                                className="relative shrink-0 w-32"
-                                                onClick={(e) => e.stopPropagation()}
-                                            >
-                                                <input
-                                                    type="number"
-                                                    min="1"
-                                                    value={orderMap[p._id] || ""}
-                                                    onChange={(e) => handleQuantityChange(p._id, Number(e.target.value))}
-                                                    placeholder="Qty"
-                                                    className="w-full text-center p-3 pr-10 rounded-xl border-2 border-blue-400 outline-none font-black text-blue-700 bg-white focus:ring-2 focus:ring-blue-300 text-base"
-                                                />
-                                                <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] font-black text-blue-400 uppercase tracking-wider leading-none">
+                                            <div className="flex flex-col items-center shrink-0" onClick={(e) => e.stopPropagation()}>
+                                                <div className="flex items-center w-36 shadow-sm rounded-xl">
+                                                    <button 
+                                                        onClick={() => handleDecrement(p._id)} 
+                                                        className="w-11 h-12 bg-gray-50 hover:bg-gray-100 active:bg-gray-200 rounded-l-xl text-gray-600 font-bold text-2xl flex items-center justify-center border-y-2 border-l-2 border-blue-400 transition-colors"
+                                                    >
+                                                        −
+                                                    </button>
+                                                    <input
+                                                        type="number"
+                                                        min="1"
+                                                        value={orderMap[p._id] === "" ? "" : orderMap[p._id]}
+                                                        onChange={(e) => handleQuantityChange(p._id, e.target.value)}
+                                                        className="w-full h-12 text-center border-y-2 border-x-0 border-blue-400 outline-none font-black text-blue-700 bg-white focus:bg-blue-50 text-xl m-0 p-0"
+                                                        style={{ MozAppearance: 'textfield' }}
+                                                    />
+                                                    <button 
+                                                        onClick={() => handleIncrement(p._id)} 
+                                                        className="w-11 h-12 bg-blue-50 hover:bg-blue-100 active:bg-blue-200 rounded-r-xl text-blue-700 font-bold text-2xl flex items-center justify-center border-y-2 border-r-2 border-blue-400 transition-colors"
+                                                    >
+                                                        +
+                                                    </button>
+                                                </div>
+                                                <span className="text-[11px] font-black text-blue-500 uppercase tracking-widest leading-none mt-2">
                                                     {p.unit || "unit"}
                                                 </span>
                                             </div>
@@ -276,7 +319,7 @@ export default function OrdersPage() {
                                         </td>
                                         <td className="py-5 px-6">
                                             <div className="bg-purple-50 text-purple-800 text-2xl font-black py-2.5 px-4 rounded-xl text-center w-full max-w-[180px] mx-auto border border-purple-200 shadow-sm whitespace-nowrap flex items-center justify-center gap-2">
-                                                <span>{orderMap[id]}</span>
+                                                <span>{orderMap[id] === "" ? 1 : orderMap[id]}</span>
                                                 <span className="text-sm font-bold text-purple-600/80 uppercase">{product.unit || "Units"}</span>
                                             </div>
                                         </td>

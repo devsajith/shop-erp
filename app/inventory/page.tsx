@@ -5,7 +5,7 @@ import { useEffect, useState, ChangeEvent, FormEvent } from "react";
 interface Product {
     _id: string;
     name: string;
-    wholesaleRate: string | number;
+    wholesaleRate?: string | number;
     retailRate: string | number;
     category: string;
     unit: string;
@@ -22,9 +22,8 @@ export default function Inventory() {
 
     const [form, setForm] = useState({
         name: "",
-        wholesaleRate: "",
         retailRate: "",
-        category: "Bakery",
+        category: "Stationary",
         unit: "KG",
     });
 
@@ -44,7 +43,7 @@ export default function Inventory() {
 
     const openAddModal = () => {
         setEditingId(null);
-        setForm({ name: "", wholesaleRate: "", retailRate: "", category: "Bakery", unit: "KG" });
+        setForm({ name: "", retailRate: "", category: "Stationary", unit: "KG" });
         setIsModalOpen(true);
     };
 
@@ -78,7 +77,6 @@ export default function Inventory() {
         setEditingId(product._id);
         setForm({
             name: product.name,
-            wholesaleRate: String(product.wholesaleRate || ""),
             retailRate: String(product.retailRate || ""),
             category: product.category,
             unit: product.unit || "KG",
@@ -139,10 +137,10 @@ export default function Inventory() {
                             onChange={(e) => setFilterCategory(e.target.value)}
                             className="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer appearance-none"
                         >
-                            <option value="All">All Categories</option>
-                            <option value="Bakery">Bakery</option>
+                            <option value="All">All Vendor Categories</option>
+                            <option value="Stationary">Stationary</option>
                             <option value="Grocery">Grocery</option>
-                            <option value="Vegetable">Vegetable</option>
+                            <option value="Veg">Veg</option>
                         </select>
                     </div>
                 </div>
@@ -161,57 +159,49 @@ export default function Inventory() {
                             <p className="text-gray-400 mt-1">Try clearing your search or changing the category.</p>
                         </div>
                     ) : (
-                        <div className="overflow-x-hidden md:overflow-x-auto">
-                            <table className="w-full text-left border-collapse block md:table pb-4 md:pb-0">
-                                <thead className="hidden md:table-header-group">
-                                    <tr className="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider border-b border-gray-100">
-                                        <th className="p-5 font-bold">Product Name</th>
-                                        <th className="p-5 font-bold">Category</th>
-                                        <th className="p-5 font-bold">Wholesale Rate</th>
-                                        <th className="p-5 font-bold">Retail Rate</th>
-                                        <th className="p-5 font-bold">Unit Metric</th>
-                                        <th className="p-5 font-bold text-right">Actions</th>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left border-collapse pb-4 md:pb-0">
+                                <thead>
+                                    <tr className="bg-gray-50 text-gray-500 text-[10px] md:text-xs uppercase tracking-wider border-b border-gray-100">
+                                        <th className="p-3 md:p-5 font-bold">Product Name</th>
+                                        <th className="hidden md:table-cell p-5 font-bold">Vendor Category</th>
+                                        <th className="p-3 md:p-5 font-bold text-right md:text-left">Retail Rate</th>
+                                        <th className="hidden md:table-cell p-5 font-bold">Unit Metric</th>
+                                        <th className="p-3 md:p-5 font-bold text-right">Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody className="block md:table-row-group divide-y-0 md:divide-y divide-gray-50 flex-col px-4 md:px-0 pt-4 md:pt-0 gap-4 flex md:block">
+                                <tbody className="divide-y divide-gray-100">
                                     {filteredProducts.map((p) => (
-                                        <tr key={p._id} className="block md:table-row hover:bg-blue-50/30 transition-colors group bg-white border border-gray-100 md:border-transparent rounded-2xl md:rounded-none p-5 md:p-0 shadow-sm md:shadow-none">
-                                            <td className="flex md:table-cell justify-between items-center md:p-5 border-b border-gray-50 md:border-none pb-4 md:pb-0 mb-4 md:mb-0">
-                                                <span className="md:hidden text-xs font-bold text-gray-400 uppercase tracking-wider">Name</span>
-                                                <p className="font-extrabold text-gray-900 text-lg md:text-base">{p.name}</p>
+                                        <tr key={p._id} className="hover:bg-blue-50/30 transition-colors group bg-white">
+                                            <td className="p-3 md:p-5">
+                                                <p className="font-extrabold text-gray-900 text-sm md:text-base leading-tight">{p.name}</p>
+                                                <span className="md:hidden inline-block text-[9px] font-bold text-gray-400 uppercase mt-0.5">{p.unit || "Unit"}</span>
                                             </td>
-                                            <td className="flex md:table-cell justify-between items-center md:p-5 mb-3 md:mb-0">
-                                                <span className="md:hidden text-xs font-bold text-gray-400 uppercase tracking-wider">Category</span>
-                                                <span className="inline-block bg-indigo-50 text-indigo-700 text-[10px] md:text-xs px-2.5 py-1 rounded-md font-bold tracking-wide uppercase">
+                                            <td className="hidden md:table-cell p-5">
+                                                <span className="inline-block bg-indigo-50 text-indigo-700 text-xs px-2.5 py-1 rounded-md font-bold tracking-wide uppercase">
                                                     {p.category}
                                                 </span>
                                             </td>
-                                            <td className="flex md:table-cell justify-between items-center md:p-5 font-bold text-blue-700 mb-3 md:mb-0">
-                                                <span className="md:hidden text-xs font-bold text-gray-400 uppercase tracking-wider">Wholesale</span>
-                                                <span>₹{p.wholesaleRate || "0"}</span>
-                                            </td>
-                                            <td className="flex md:table-cell justify-between items-center md:p-5 font-extrabold text-green-700 mb-3 md:mb-0">
-                                                <span className="md:hidden text-xs font-bold text-gray-400 uppercase tracking-wider">Retail</span>
+                                            <td className="p-3 md:p-5 font-extrabold text-green-700 text-sm md:text-base text-right md:text-left">
                                                 <span>₹{p.retailRate || "0"}</span>
                                             </td>
-                                            <td className="flex md:table-cell justify-between items-center md:p-5 border-b border-gray-50 md:border-none pb-5 md:pb-0 mb-4 md:mb-0">
-                                                <span className="md:hidden text-xs font-bold text-gray-400 uppercase tracking-wider">Unit Setup</span>
-                                                <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-[10px] md:text-xs font-bold tracking-wider uppercase border border-gray-200 shadow-sm">
+                                            <td className="hidden md:table-cell p-5">
+                                                <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-bold tracking-wider uppercase border border-gray-200 shadow-sm">
                                                     {p.unit || "Per Unit"}
                                                 </span>
                                             </td>
-                                            <td className="flex md:table-cell justify-around md:justify-end gap-2 md:p-5 pt-2 md:pt-0">
+                                            <td className="p-3 md:p-5 text-right whitespace-nowrap">
                                                 <button
                                                     onClick={() => handleEdit(p)}
-                                                    className="flex-1 md:flex-none text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-100 md:border-transparent md:bg-transparent px-3 py-2.5 md:py-1.5 rounded-xl md:rounded-lg transition-colors text-sm font-bold inline-flex justify-center items-center"
+                                                    className="text-blue-600 bg-blue-50 hover:bg-blue-100 px-2.5 py-1.5 md:px-3 md:py-1.5 rounded-lg transition-colors text-xs font-bold mr-1.5 md:mr-2"
                                                 >
-                                                    Edit Item
+                                                    Edit
                                                 </button>
                                                 <button
                                                     onClick={() => handleDelete(p._id)}
-                                                    className="flex-1 md:flex-none text-red-500 bg-red-50 hover:bg-red-100 border border-red-100 md:border-transparent md:bg-transparent px-3 py-2.5 md:py-1.5 rounded-xl md:rounded-lg transition-colors text-sm font-bold inline-flex justify-center items-center"
+                                                    className="text-red-500 bg-red-50 hover:bg-red-100 px-2.5 py-1.5 md:px-3 md:py-1.5 rounded-lg transition-colors text-xs font-bold"
                                                 >
-                                                    Delete
+                                                    Del
                                                 </button>
                                             </td>
                                         </tr>
@@ -255,29 +245,17 @@ export default function Inventory() {
 
                                 {/* Input: Category Dropdown */}
                                 <div className="flex flex-col gap-2 mt-auto w-full">
-                                    <label htmlFor="category" className="text-sm font-semibold text-gray-700 ml-1">Category</label>
+                                    <label htmlFor="category" className="text-sm font-semibold text-gray-700 ml-1">Vendor Category</label>
                                     <select
                                         id="category" name="category"
                                         value={form.category} onChange={handleChange}
                                         className="p-4 bg-gray-50 border border-gray-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition-all cursor-pointer appearance-none w-full"
                                         required
                                     >
-                                        <option value="Bakery">Bakery</option>
+                                        <option value="Stationary">Stationary</option>
                                         <option value="Grocery">Grocery</option>
-                                        <option value="Vegetable">Vegetable</option>
+                                        <option value="Veg">Veg</option>
                                     </select>
-                                </div>
-
-                                {/* Input: Wholesale Rate */}
-                                <div className="flex flex-col gap-2 mt-auto w-full">
-                                    <label htmlFor="wholesaleRate" className="text-sm font-semibold text-gray-700 ml-1">Wholesale Rate (₹)</label>
-                                    <input
-                                        id="wholesaleRate" name="wholesaleRate" type="number"
-                                        placeholder="0.00"
-                                        value={form.wholesaleRate} onChange={handleChange}
-                                        className="p-4 bg-gray-50 border border-gray-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition-all font-medium w-full"
-                                        required
-                                    />
                                 </div>
 
                                 {/* Input: Retail Rate */}
@@ -306,7 +284,7 @@ export default function Inventory() {
                                         <option value="Liter">Liters</option>
                                         <option value="Packet">Packet</option>
                                         <option value="Piece">Piece</option>
-                                        <option value="Carton">Carton / Box</option>
+                                        <option value="Box">Box</option>
                                     </select>
                                 </div>
 

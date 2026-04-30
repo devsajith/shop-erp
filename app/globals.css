@@ -35,3 +35,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 input[type="date"]::-webkit-calendar-picker-indicator:hover {
     opacity: 1;
 }
+
+/* Hide global home button when any full-screen modal overlay is open */
+body:has(.fixed.inset-0.z-50) #global-home-button {
+  opacity: 0;
+  pointer-events: none;
+}

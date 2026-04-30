@@ -76,38 +76,36 @@ export default function Closing() {
             <p className="text-gray-500 mt-2 md:mt-4 md:text-lg font-medium">Finalize your day by logging currently held balances.</p>
           </div>
 
-          <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row items-start md:items-center justify-between md:justify-start gap-4 md:gap-8 w-full xl:w-auto relative">
-             <div className="flex items-center gap-4 group cursor-help">
-               <div className="bg-green-50 p-3 rounded-xl text-green-600">
+          <div className="flex flex-row w-full xl:w-auto gap-3 md:gap-5">
+             {/* Monthly Profit Card */}
+             <div className="flex-1 md:w-56 bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col gap-3 md:gap-4 relative group hover:border-green-200 transition-all hover:shadow-md cursor-help">
+               <div className="bg-green-50 w-10 h-10 md:w-12 md:h-12 rounded-2xl flex items-center justify-center text-green-600 shadow-inner">
                  <span className="text-xl">📈</span>
                </div>
                <div>
-                 <p className="text-[11px] md:text-sm font-bold text-gray-400 uppercase tracking-widest">Monthly Profit</p>
-                 <p className="text-xl md:text-2xl font-black text-green-600 leading-none mt-1 shadow-sm">₹{(monthlyData?.totalProfit || 0).toLocaleString()}</p>
-                 
+                 <p className="text-[10px] md:text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Monthly Profit</p>
+                 <p className="text-2xl md:text-3xl font-black text-green-600 tracking-tighter">₹{(monthlyData?.totalProfit || 0).toLocaleString()}</p>
                </div>
                 {/* Tooltip Explanation */}
-                <div className="absolute top-full mt-2 left-0 w-64 bg-gray-900 text-white text-xs p-3 rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                <div className="absolute top-full mt-2 left-0 w-64 bg-gray-900 text-white text-xs p-3 rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 shadow-xl">
                   <p className="font-bold border-b border-gray-700 pb-1 mb-1">How is Profit Calculated?</p>
-                  <p> Profit is the direct sum of the Cash & Digital balances you enter here every night. (Net Income held in the till).</p>
+                  <p className="text-gray-300 leading-relaxed">Profit is the direct sum of the Cash & Digital balances you enter here every night. (Net Income held in the till).</p>
                 </div>
              </div>
 
-             <div className="hidden md:block w-px h-10 bg-gray-100"></div>
-             <div className="md:hidden w-full h-px bg-gray-100"></div>
-
-             <div className="flex items-center gap-4 group cursor-help">
-               <div className="bg-blue-50 p-3 rounded-xl text-blue-600">
+             {/* Monthly Collection Card */}
+             <div className="flex-1 md:w-56 bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col gap-3 md:gap-4 relative group hover:border-blue-200 transition-all hover:shadow-md cursor-help">
+               <div className="bg-blue-50 w-10 h-10 md:w-12 md:h-12 rounded-2xl flex items-center justify-center text-blue-600 shadow-inner">
                  <span className="text-xl">💰</span>
                </div>
                <div>
-                 <p className="text-[11px] md:text-sm font-bold text-gray-400 uppercase tracking-widest">Monthly Collection</p>
-                 <p className="text-xl md:text-2xl font-black text-blue-600 leading-none mt-1 shadow-sm">₹{(monthlyData?.totalCollection || 0).toLocaleString()}</p>
+                 <p className="text-[10px] md:text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Monthly Collection</p>
+                 <p className="text-2xl md:text-3xl font-black text-blue-600 tracking-tighter">₹{(monthlyData?.totalCollection || 0).toLocaleString()}</p>
                </div>
                {/* Tooltip Explanation */}
-                <div className="absolute top-full right-0 mt-2 w-72 bg-gray-900 text-white text-xs p-3 rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                <div className="absolute top-full right-0 md:left-0 md:right-auto mt-2 w-72 bg-gray-900 text-white text-xs p-3 rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 shadow-xl">
                   <p className="font-bold border-b border-gray-700 pb-1 mb-1">What is Total Collection?</p>
-                  <p> This is your Gross Intake (sales). It checks your declared Profit and adds back the daytime Expenses automatically: <br/><strong>Profit + Expenses = Collection</strong>.</p>
+                  <p className="text-gray-300 leading-relaxed">This is your Gross Intake (sales). It checks your declared Profit and adds back the daytime Expenses automatically: <br/><strong className="text-white mt-1 block">Profit + Expenses = Collection</strong></p>
                 </div>
              </div>
           </div>

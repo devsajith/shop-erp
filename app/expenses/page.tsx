@@ -142,28 +142,28 @@ export default function Expenses() {
             </div>
             <p className="text-gray-500 mt-2 md:mt-4 md:text-lg font-medium">Tracking and adding records for the selected date.</p>
           </div>
-          <div className="bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-gray-100 grid grid-cols-2 md:flex md:flex-row items-center justify-between md:justify-start gap-4 md:gap-8 w-full xl:w-auto">
-             <div className="flex flex-col md:flex-row items-start md:items-center gap-3 md:gap-4">
-               <div className="bg-orange-50 p-2.5 md:p-3 rounded-xl text-orange-600 self-start md:self-center shrink-0">
+          <div className="flex flex-row w-full xl:w-auto gap-3 md:gap-5">
+            {/* Daily Outflow Card */}
+            <div className="flex-1 md:w-48 bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col gap-3 md:gap-4 relative overflow-hidden group hover:border-orange-200 transition-all hover:shadow-md">
+               <div className="bg-orange-50 w-10 h-10 md:w-12 md:h-12 rounded-2xl flex items-center justify-center text-orange-600 shadow-inner">
                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" className="md:w-6 md:h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
                </div>
                <div>
-                 <p className="text-[10px] md:text-sm font-bold text-gray-400 uppercase tracking-widest">Daily Outflow</p>
-                 <p className="text-lg md:text-2xl font-black text-gray-900 leading-none mt-1 shadow-sm truncate max-w-[80px] md:max-w-none">₹{dailyTotal.toLocaleString()}</p>
+                 <p className="text-[10px] md:text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Daily Outflow</p>
+                 <p className="text-2xl md:text-3xl font-black text-gray-900 tracking-tighter">₹{dailyTotal.toLocaleString()}</p>
                </div>
-             </div>
+            </div>
 
-             <div className="hidden md:block w-px h-10 bg-gray-100"></div>
-
-             <div className="flex flex-col md:flex-row items-start md:items-center gap-3 md:gap-4 border-l border-gray-100 md:border-none pl-4 md:pl-0">
-               <div className="bg-purple-50 p-2.5 md:p-3 rounded-xl text-purple-600 self-start md:self-center shrink-0">
+            {/* Monthly Outflow Card */}
+            <div className="flex-1 md:w-48 bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col gap-3 md:gap-4 relative overflow-hidden group hover:border-purple-200 transition-all hover:shadow-md">
+               <div className="bg-purple-50 w-10 h-10 md:w-12 md:h-12 rounded-2xl flex items-center justify-center text-purple-600 shadow-inner">
                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" className="md:w-6 md:h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                </div>
                <div>
-                 <p className="text-[10px] md:text-sm font-bold text-gray-400 uppercase tracking-widest">Monthly Outflow</p>
-                 <p className="text-lg md:text-2xl font-black text-purple-900 leading-none mt-1 shadow-sm truncate max-w-[80px] md:max-w-none">₹{monthlyTotal.toLocaleString()}</p>
+                 <p className="text-[10px] md:text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Monthly Outflow</p>
+                 <p className="text-2xl md:text-3xl font-black text-purple-900 tracking-tighter">₹{monthlyTotal.toLocaleString()}</p>
                </div>
-             </div>
+            </div>
           </div>
         </div>
 
