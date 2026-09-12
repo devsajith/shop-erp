@@ -16,7 +16,7 @@ export default function OrdersPage() {
     const [products, setProducts] = useState<Product[]>([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [filterCategory, setFilterCategory] = useState("All");
-    const categories = ["All", "Stationary", "Grocery", "Veg"];
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
     // State to hold quantities: Record<productId, quantity>
     const [orderMap, setOrderMap] = useState<Record<string, number | "">>({});
@@ -76,6 +76,24 @@ export default function OrdersPage() {
         });
     };
 
+    const handleRemoveItem = (productId: string) => {
+        setOrderMap((prev) => {
+            const newMap = { ...prev };
+            delete newMap[productId];
+            return newMap;
+        });
+    };
+
+    const handleClearAll = () => {
+        if (confirm("Are you sure you want to clear all selected items?")) {
+            setOrderMap({});
+            setIsEditModalOpen(false);
+            if (filterCategory === "Selected") {
+                setFilterCategory("All");
+            }
+        }
+    };
+
     const exportAsImage = async () => {
         const selectedProductIds = Object.keys(orderMap);
         if (selectedProductIds.length === 0) {
@@ -114,13 +132,24 @@ export default function OrdersPage() {
         document.body.removeChild(link);
     };
 
+    const selectedCount = Object.keys(orderMap).length;
+
     const filteredProducts = products.filter((p) => {
         const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase());
+        if (filterCategory === "Selected") {
+            return matchesSearch && orderMap[p._id] !== undefined;
+        }
         const matchesCategory = filterCategory === "All" || p.category === filterCategory;
         return matchesSearch && matchesCategory;
     });
 
-    const selectedCount = Object.keys(orderMap).length;
+    const categoryList = [
+        "All",
+        ...(selectedCount > 0 ? ["Selected"] : []),
+        "Stationary",
+        "Grocery",
+        "Veg"
+    ];
 
     return (
         <div className="min-h-screen bg-gray-50 text-gray-900 font-sans pb-32 relative">
@@ -142,14 +171,25 @@ export default function OrdersPage() {
                         <p className="text-gray-500 mt-2 text-lg">Select items and define quantities to build your order sheet.</p>
                     </div>
 
-                    <button
-                        onClick={exportAsImage}
-                        className="bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white font-bold text-lg py-3 px-8 rounded-full transition-colors shadow-md shadow-purple-500/30 flex items-center justify-center gap-2 shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled={selectedCount === 0}
-                    >
-                        <span className="text-xl">📸</span>
-                        Export Image
-                    </button>
+                    <div className="flex flex-wrap items-center gap-3 shrink-0">
+                        {selectedCount > 0 && (
+                            <button
+                                onClick={() => setIsEditModalOpen(true)}
+                                className="bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-bold text-lg py-3 px-6 rounded-full transition-colors flex items-center justify-center gap-2 shadow-sm"
+                            >
+                                <span>✏️</span>
+                                Edit Selected ({selectedCount})
+                            </button>
+                        )}
+                        <button
+                            onClick={exportAsImage}
+                            className="bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white font-bold text-lg py-3 px-8 rounded-full transition-colors shadow-md shadow-purple-500/30 flex items-center justify-center gap-2 shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={selectedCount === 0}
+                        >
+                            <span className="text-xl">📸</span>
+                            Export Image
+                        </button>
+                    </div>
                 </div>
 
                 {/* Filter and Search Bar */}
@@ -167,7 +207,7 @@ export default function OrdersPage() {
 
                     {/* Category Filter Pills */}
                     <div className="flex flex-wrap gap-2">
-                        {categories.map((cat) => (
+                        {categoryList.map((cat) => (
                             <button
                                 key={cat}
                                 onClick={() => setFilterCategory(cat)}
@@ -176,7 +216,11 @@ export default function OrdersPage() {
                                         : "bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100"
                                     }`}
                             >
-                                {cat === "All" ? "All Categories" : cat}
+                                {cat === "All"
+                                    ? "All Categories"
+                                    : cat === "Selected"
+                                    ? `Selected (${selectedCount})`
+                                    : cat}
                             </button>
                         ))}
                     </div>
@@ -201,7 +245,7 @@ export default function OrdersPage() {
                     ) : filteredProducts.length === 0 ? (
                         <div className="text-center py-16">
                             <h3 className="text-xl font-semibold text-gray-600">No products match your filters</h3>
-                            <p className="text-gray-400 mt-1">Try clearing your search or changing the category.</p>
+                            <p className="text-gray-400 mt-1">Try clearing your search or changing the category filter.</p>
                         </div>
                     ) : (
                         <div className="divide-y divide-gray-50">
@@ -270,19 +314,144 @@ export default function OrdersPage() {
 
             {/* Floating Action Bar summary */}
             {selectedCount > 0 && (
-                <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 px-8 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] z-50 flex items-center justify-between mx-auto md:w-[600px] md:bottom-6 md:rounded-[2rem] md:border">
-                    <p className="font-bold text-lg text-gray-800">
+                <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 px-6 md:px-8 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] z-40 flex items-center justify-between mx-auto md:w-[650px] md:bottom-6 md:rounded-[2rem] md:border">
+                    <p className="font-bold text-lg text-gray-800 flex items-center">
                         <span className="bg-purple-600 text-white px-3 py-1 rounded-full text-sm mr-3">
                             {selectedCount}
                         </span>
                         Item{selectedCount > 1 ? 's' : ''} Selected
                     </p>
-                    <button
-                        onClick={exportAsImage}
-                        className="bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white px-6 py-2.5 rounded-full font-bold shadow-md shadow-purple-500/20 transition-colors flex items-center gap-2"
-                    >
-                        <span>📸</span> Download Image
-                    </button>
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={() => setIsEditModalOpen(true)}
+                            className="bg-blue-50 hover:bg-blue-100 active:bg-blue-200 text-blue-700 border border-blue-200 px-4 py-2.5 rounded-full font-bold transition-colors flex items-center gap-1.5 text-sm md:text-base"
+                        >
+                            <span>✏️</span> Edit Items
+                        </button>
+                        <button
+                            onClick={exportAsImage}
+                            className="bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white px-5 md:px-6 py-2.5 rounded-full font-bold shadow-md shadow-purple-500/20 transition-colors flex items-center gap-2 text-sm md:text-base"
+                        >
+                            <span>📸</span> Download Image
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Modal for Editing Selected Items */}
+            {isEditModalOpen && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+                        {/* Modal Header */}
+                        <div className="p-5 md:p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/80">
+                            <div>
+                                <h2 className="text-xl md:text-2xl font-extrabold text-gray-900">Selected Items ({selectedCount})</h2>
+                                <p className="text-xs md:text-sm text-gray-500 mt-0.5">Review and adjust quantities for your order</p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                {selectedCount > 0 && (
+                                    <button
+                                        onClick={handleClearAll}
+                                        className="text-xs font-bold text-red-600 hover:text-red-700 hover:bg-red-50 px-3 py-1.5 rounded-lg transition-colors border border-red-200"
+                                    >
+                                        Clear All
+                                    </button>
+                                )}
+                                <button
+                                    onClick={() => setIsEditModalOpen(false)}
+                                    className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-200 text-gray-600 hover:bg-gray-300 font-bold transition-colors text-sm"
+                                >
+                                    ✕
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Modal Body / Items List */}
+                        <div className="p-4 md:p-6 overflow-y-auto flex-1 divide-y divide-gray-100">
+                            {selectedCount === 0 ? (
+                                <div className="text-center py-12">
+                                    <div className="text-4xl mb-3">🛒</div>
+                                    <p className="text-gray-500 font-medium">No items selected yet.</p>
+                                    <p className="text-xs text-gray-400 mt-1">Select items from the catalog to add them to your order.</p>
+                                </div>
+                            ) : (
+                                Object.keys(orderMap).map((productId) => {
+                                    const product = products.find((p) => p._id === productId);
+                                    if (!product) return null;
+                                    const qty = orderMap[productId];
+
+                                    return (
+                                        <div key={productId} className="py-3.5 first:pt-0 last:pb-0 flex items-center justify-between gap-3">
+                                            <div className="flex-1 min-w-0">
+                                                <h4 className="font-extrabold text-gray-900 text-base leading-tight truncate">{product.name}</h4>
+                                                <div className="flex items-center gap-2 mt-1">
+                                                    <span className="inline-block bg-indigo-50 text-indigo-600 text-[10px] px-2 py-0.5 rounded font-bold uppercase">
+                                                        {product.category}
+                                                    </span>
+                                                    <span className="text-xs font-medium text-gray-400">({product.unit || "unit"})</span>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-center gap-2 md:gap-3 shrink-0">
+                                                <div className="flex items-center w-32 shadow-sm rounded-xl">
+                                                    <button
+                                                        onClick={() => handleDecrement(productId)}
+                                                        className="w-9 h-10 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 rounded-l-xl text-gray-700 font-bold text-xl flex items-center justify-center border-y border-l border-gray-300 transition-colors"
+                                                    >
+                                                        −
+                                                    </button>
+                                                    <input
+                                                        type="number"
+                                                        min="1"
+                                                        value={qty === "" ? "" : qty}
+                                                        onChange={(e) => handleQuantityChange(productId, e.target.value)}
+                                                        className="w-full h-10 text-center border-y border-x-0 border-gray-300 outline-none font-black text-blue-700 bg-white focus:bg-blue-50 text-lg m-0 p-0"
+                                                        style={{ MozAppearance: 'textfield' }}
+                                                    />
+                                                    <button
+                                                        onClick={() => handleIncrement(productId)}
+                                                        className="w-9 h-10 bg-blue-50 hover:bg-blue-100 active:bg-blue-200 rounded-r-xl text-blue-700 font-bold text-xl flex items-center justify-center border-y border-r border-blue-300 transition-colors"
+                                                    >
+                                                        +
+                                                    </button>
+                                                </div>
+
+                                                <button
+                                                    onClick={() => handleRemoveItem(productId)}
+                                                    title="Remove item"
+                                                    className="w-9 h-10 flex items-center justify-center text-red-500 hover:text-red-700 hover:bg-red-50 rounded-xl transition-colors"
+                                                >
+                                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    );
+                                })
+                            )}
+                        </div>
+
+                        {/* Modal Footer */}
+                        <div className="p-4 px-6 border-t border-gray-100 bg-gray-50 flex items-center justify-between gap-4">
+                            <button
+                                onClick={() => setIsEditModalOpen(false)}
+                                className="px-5 py-2 rounded-full border border-gray-300 font-bold text-gray-700 hover:bg-gray-100 transition-colors text-sm md:text-base"
+                            >
+                                Done Editing
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setIsEditModalOpen(false);
+                                    exportAsImage();
+                                }}
+                                disabled={selectedCount === 0}
+                                className="bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white font-bold px-5 py-2 rounded-full transition-colors shadow-md flex items-center gap-2 disabled:opacity-50 text-sm md:text-base"
+                            >
+                                <span>📸</span> Export Image
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
 
@@ -338,3 +507,4 @@ export default function OrdersPage() {
         </div>
     );
 }
+
