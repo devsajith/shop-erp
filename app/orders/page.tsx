@@ -18,6 +18,14 @@ export default function OrdersPage() {
     const [filterCategory, setFilterCategory] = useState("All");
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
+    // State for editing product details (Name, Category, Unit)
+    const [editingProductId, setEditingProductId] = useState<string | null>(null);
+    const [editForm, setEditForm] = useState({
+        name: "",
+        category: "Stationary",
+        unit: "unit",
+    });
+
     // State to hold quantities: Record<productId, quantity>
     const [orderMap, setOrderMap] = useState<Record<string, number | "">>({});
 
@@ -94,6 +102,52 @@ export default function OrdersPage() {
         }
     };
 
+    // Product info editing actions
+    const handleStartEditProduct = (p: Product) => {
+        setEditingProductId(p._id);
+        setEditForm({
+            name: p.name,
+            category: p.category || "Stationary",
+            unit: p.unit || "unit",
+        });
+    };
+
+    const handleSaveProductInfo = async (productId: string) => {
+        if (!editForm.name.trim()) {
+            alert("Product name cannot be empty.");
+            return;
+        }
+        const product = products.find((p) => p._id === productId);
+        if (!product) return;
+
+        const updated = {
+            ...product,
+            name: editForm.name.trim(),
+            category: editForm.category.trim(),
+            unit: editForm.unit.trim(),
+        };
+
+        try {
+            const res = await fetch(`/api/products/${productId}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(updated),
+            });
+
+            if (res.ok) {
+                setProducts((prev) =>
+                    prev.map((p) => (p._id === productId ? updated : p))
+                );
+                setEditingProductId(null);
+            } else {
+                alert("Failed to update product details.");
+            }
+        } catch (error) {
+            console.error("Error updating product:", error);
+            alert("Error updating product details.");
+        }
+    };
+
     const exportAsImage = async () => {
         const selectedProductIds = Object.keys(orderMap);
         if (selectedProductIds.length === 0) {
@@ -104,23 +158,19 @@ export default function OrdersPage() {
         const element = document.getElementById("invoice-receipt");
         if (!element) return;
 
-        // Ensure element is visible physically but offscreen
         element.style.position = "fixed";
         element.style.top = "0";
         element.style.left = "0";
         element.style.zIndex = "-100";
 
-        // Crucial: Wait for the browser to repaint and calculate fonts/CSS
         await new Promise((resolve) => setTimeout(resolve, 150));
 
-        // Convert to PNG 
         const dataUrl = await htmlToImage.toPng(element, {
             pixelRatio: 2,
             backgroundColor: "#ffffff",
             cacheBust: true,
         });
 
-        // Safely hide and reset again
         element.style.position = "absolute";
         element.style.top = "-9999px";
 
@@ -143,12 +193,13 @@ export default function OrdersPage() {
         return matchesSearch && matchesCategory;
     });
 
+    const uniqueCategories = Array.from(new Set(products.map((p) => p.category || "Stationary")));
+    const baseCategories = Array.from(new Set(["Stationary", "Grocery", "Veg", ...uniqueCategories]));
+
     const categoryList = [
         "All",
         ...(selectedCount > 0 ? ["Selected"] : []),
-        "Stationary",
-        "Grocery",
-        "Veg"
+        ...baseCategories
     ];
 
     return (
@@ -168,7 +219,7 @@ export default function OrdersPage() {
                         <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-gray-900">
                             Order Creator
                         </h1>
-                        <p className="text-gray-500 mt-2 text-lg">Select items and define quantities to build your order sheet.</p>
+                        <p className="text-gray-500 mt-2 text-lg">Select items, edit product details, and define quantities to build your order sheet.</p>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-3 shrink-0">
@@ -232,7 +283,7 @@ export default function OrdersPage() {
                     <div className="hidden md:grid grid-cols-[auto_1fr_auto_180px] gap-4 items-center px-5 py-3 bg-gray-50 border-b border-gray-100 text-gray-400 text-xs font-bold uppercase tracking-widest">
                         <span className="w-6"></span>
                         <span>Product</span>
-                        <span>Category</span>
+                        <span>Category & Actions</span>
                         <span className="text-center">Qty to Order</span>
                     </div>
 
@@ -251,32 +302,95 @@ export default function OrdersPage() {
                         <div className="divide-y divide-gray-50">
                             {filteredProducts.map((p) => {
                                 const isSelected = orderMap[p._id] !== undefined;
+                                const isEditingThis = editingProductId === p._id;
+
                                 return (
                                     <div
                                         key={p._id}
-                                        onClick={() => handleCheckboxChange(p._id, !isSelected)}
-                                        className={`flex items-center gap-3 px-4 py-4 cursor-pointer transition-colors select-none ${isSelected ? "bg-blue-50 border-l-4 border-blue-500" : "hover:bg-gray-50 border-l-4 border-transparent"}`}
+                                        onClick={() => !isEditingThis && handleCheckboxChange(p._id, !isSelected)}
+                                        className={`flex flex-col md:flex-row md:items-center gap-3 px-4 py-4 cursor-pointer transition-colors select-none ${isSelected ? "bg-blue-50/70 border-l-4 border-blue-500" : "hover:bg-gray-50 border-l-4 border-transparent"}`}
                                     >
-                                        {/* Checkbox */}
-                                        <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center shrink-0 transition-colors ${isSelected ? "bg-blue-600 border-blue-600" : "border-gray-300 bg-white"}`}>
-                                            {isSelected && (
-                                                <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                                </svg>
+                                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                                            {/* Checkbox */}
+                                            <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center shrink-0 transition-colors ${isSelected ? "bg-blue-600 border-blue-600" : "border-gray-300 bg-white"}`}>
+                                                {isSelected && (
+                                                    <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                )}
+                                            </div>
+
+                                            {/* Product Info / Edit Mode */}
+                                            {isEditingThis ? (
+                                                <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 flex-1 w-full" onClick={(e) => e.stopPropagation()}>
+                                                    <input
+                                                        type="text"
+                                                        value={editForm.name}
+                                                        onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                                                        placeholder="Product Name"
+                                                        className="bg-white border border-gray-300 p-2 rounded-xl text-base font-bold text-gray-900 focus:ring-2 focus:ring-blue-500 outline-none flex-1"
+                                                    />
+                                                    <select
+                                                        value={editForm.category}
+                                                        onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
+                                                        className="bg-white border border-gray-300 p-2 rounded-xl text-sm font-semibold text-gray-700 focus:ring-2 focus:ring-blue-500 outline-none"
+                                                    >
+                                                        {baseCategories.map((c) => (
+                                                            <option key={c} value={c}>{c}</option>
+                                                        ))}
+                                                    </select>
+                                                    <input
+                                                        type="text"
+                                                        value={editForm.unit}
+                                                        onChange={(e) => setEditForm({ ...editForm, unit: e.target.value })}
+                                                        placeholder="Unit (e.g. KG, PCS)"
+                                                        className="bg-white border border-gray-300 p-2 rounded-xl text-sm font-semibold text-gray-700 w-28 focus:ring-2 focus:ring-blue-500 outline-none"
+                                                    />
+                                                    <div className="flex items-center gap-2 shrink-0">
+                                                        <button
+                                                            onClick={() => handleSaveProductInfo(p._id)}
+                                                            className="bg-green-600 hover:bg-green-700 text-white font-bold px-3 py-1.5 rounded-xl text-sm transition-colors shadow-sm"
+                                                        >
+                                                            Save
+                                                        </button>
+                                                        <button
+                                                            onClick={() => setEditingProductId(null)}
+                                                            className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold px-3 py-1.5 rounded-xl text-sm transition-colors"
+                                                        >
+                                                            Cancel
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="flex-1 min-w-0 flex items-center justify-between gap-2">
+                                                    <div>
+                                                        <p className={`font-extrabold text-base leading-tight truncate ${isSelected ? "text-blue-900" : "text-gray-900"}`}>{p.name}</p>
+                                                        <div className="flex items-center gap-2 mt-1">
+                                                            <span className="inline-block bg-indigo-50 text-indigo-600 text-[10px] px-2 py-0.5 rounded font-bold tracking-wider uppercase">
+                                                                {p.category}
+                                                            </span>
+                                                            <span className="text-xs text-gray-400 font-medium">({p.unit || "unit"})</span>
+                                                        </div>
+                                                    </div>
+
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleStartEditProduct(p);
+                                                        }}
+                                                        title="Edit Product Info (Name, Category, Unit)"
+                                                        className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors flex items-center gap-1 text-xs font-bold"
+                                                    >
+                                                        <span>✏️</span>
+                                                        <span className="hidden sm:inline">Edit Info</span>
+                                                    </button>
+                                                </div>
                                             )}
                                         </div>
 
-                                        {/* Name + Category */}
-                                        <div className="flex-1 min-w-0">
-                                            <p className={`font-extrabold text-base leading-tight truncate ${isSelected ? "text-blue-900" : "text-gray-900"}`}>{p.name}</p>
-                                            <span className="inline-block bg-indigo-50 text-indigo-600 text-[10px] px-2 py-0.5 rounded font-bold tracking-wider uppercase mt-1">
-                                                {p.category}
-                                            </span>
-                                        </div>
-
                                         {/* Qty Input */}
-                                        {isSelected && (
-                                            <div className="flex flex-col items-center shrink-0" onClick={(e) => e.stopPropagation()}>
+                                        {isSelected && !isEditingThis && (
+                                            <div className="flex flex-col items-center shrink-0 self-end md:self-center" onClick={(e) => e.stopPropagation()}>
                                                 <div className="flex items-center w-36 shadow-sm rounded-xl">
                                                     <button 
                                                         onClick={() => handleDecrement(p._id)} 
@@ -326,7 +440,7 @@ export default function OrdersPage() {
                             onClick={() => setIsEditModalOpen(true)}
                             className="bg-blue-50 hover:bg-blue-100 active:bg-blue-200 text-blue-700 border border-blue-200 px-4 py-2.5 rounded-full font-bold transition-colors flex items-center gap-1.5 text-sm md:text-base"
                         >
-                            <span>✏️</span> Edit Items
+                            <span>✏️</span> Edit Selected Items
                         </button>
                         <button
                             onClick={exportAsImage}
@@ -346,7 +460,7 @@ export default function OrdersPage() {
                         <div className="p-5 md:p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/80">
                             <div>
                                 <h2 className="text-xl md:text-2xl font-extrabold text-gray-900">Selected Items ({selectedCount})</h2>
-                                <p className="text-xs md:text-sm text-gray-500 mt-0.5">Review and adjust quantities for your order</p>
+                                <p className="text-xs md:text-sm text-gray-500 mt-0.5">Edit product details (Name, Category, Unit) or adjust quantities</p>
                             </div>
                             <div className="flex items-center gap-2">
                                 {selectedCount > 0 && (
@@ -358,7 +472,10 @@ export default function OrdersPage() {
                                     </button>
                                 )}
                                 <button
-                                    onClick={() => setIsEditModalOpen(false)}
+                                    onClick={() => {
+                                        setIsEditModalOpen(false);
+                                        setEditingProductId(null);
+                                    }}
                                     className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-200 text-gray-600 hover:bg-gray-300 font-bold transition-colors text-sm"
                                 >
                                     ✕
@@ -379,53 +496,110 @@ export default function OrdersPage() {
                                     const product = products.find((p) => p._id === productId);
                                     if (!product) return null;
                                     const qty = orderMap[productId];
+                                    const isEditingThis = editingProductId === productId;
 
                                     return (
-                                        <div key={productId} className="py-3.5 first:pt-0 last:pb-0 flex items-center justify-between gap-3">
-                                            <div className="flex-1 min-w-0">
-                                                <h4 className="font-extrabold text-gray-900 text-base leading-tight truncate">{product.name}</h4>
-                                                <div className="flex items-center gap-2 mt-1">
-                                                    <span className="inline-block bg-indigo-50 text-indigo-600 text-[10px] px-2 py-0.5 rounded font-bold uppercase">
-                                                        {product.category}
-                                                    </span>
-                                                    <span className="text-xs font-medium text-gray-400">({product.unit || "unit"})</span>
+                                        <div key={productId} className="py-3.5 first:pt-0 last:pb-0 flex flex-col gap-3">
+                                            {isEditingThis ? (
+                                                <div className="bg-blue-50/60 p-3 rounded-2xl border border-blue-200 flex flex-col gap-2">
+                                                    <p className="text-xs font-bold text-blue-700 uppercase tracking-wider">Edit Product Details</p>
+                                                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                                                        <input
+                                                            type="text"
+                                                            value={editForm.name}
+                                                            onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                                                            placeholder="Product Name"
+                                                            className="bg-white border border-gray-300 p-2 rounded-xl text-base font-bold text-gray-900 focus:ring-2 focus:ring-blue-500 outline-none flex-1"
+                                                        />
+                                                        <select
+                                                            value={editForm.category}
+                                                            onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
+                                                            className="bg-white border border-gray-300 p-2 rounded-xl text-sm font-semibold text-gray-700 focus:ring-2 focus:ring-blue-500 outline-none"
+                                                        >
+                                                            {baseCategories.map((c) => (
+                                                                <option key={c} value={c}>{c}</option>
+                                                            ))}
+                                                        </select>
+                                                        <input
+                                                            type="text"
+                                                            value={editForm.unit}
+                                                            onChange={(e) => setEditForm({ ...editForm, unit: e.target.value })}
+                                                            placeholder="Unit (e.g. KG, PCS)"
+                                                            className="bg-white border border-gray-300 p-2 rounded-xl text-sm font-semibold text-gray-700 w-28 focus:ring-2 focus:ring-blue-500 outline-none"
+                                                        />
+                                                    </div>
+                                                    <div className="flex items-center justify-end gap-2 mt-1">
+                                                        <button
+                                                            onClick={() => handleSaveProductInfo(productId)}
+                                                            className="bg-green-600 hover:bg-green-700 text-white font-bold px-4 py-1.5 rounded-xl text-sm transition-colors shadow-sm"
+                                                        >
+                                                            Save Details
+                                                        </button>
+                                                        <button
+                                                            onClick={() => setEditingProductId(null)}
+                                                            className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold px-3 py-1.5 rounded-xl text-sm transition-colors"
+                                                        >
+                                                            Cancel
+                                                        </button>
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            ) : (
+                                                <div className="flex items-center justify-between gap-3">
+                                                    <div className="flex-1 min-w-0">
+                                                        <div className="flex items-center gap-2">
+                                                            <h4 className="font-extrabold text-gray-900 text-base leading-tight truncate">{product.name}</h4>
+                                                            <button
+                                                                onClick={() => handleStartEditProduct(product)}
+                                                                title="Edit Product Details (Name, Category, Unit)"
+                                                                className="text-xs text-blue-600 hover:text-blue-800 font-bold hover:underline flex items-center gap-0.5 shrink-0"
+                                                            >
+                                                                <span>✏️</span> Edit
+                                                            </button>
+                                                        </div>
+                                                        <div className="flex items-center gap-2 mt-1">
+                                                            <span className="inline-block bg-indigo-50 text-indigo-600 text-[10px] px-2 py-0.5 rounded font-bold uppercase">
+                                                                {product.category}
+                                                            </span>
+                                                            <span className="text-xs font-medium text-gray-400">({product.unit || "unit"})</span>
+                                                        </div>
+                                                    </div>
 
-                                            <div className="flex items-center gap-2 md:gap-3 shrink-0">
-                                                <div className="flex items-center w-32 shadow-sm rounded-xl">
-                                                    <button
-                                                        onClick={() => handleDecrement(productId)}
-                                                        className="w-9 h-10 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 rounded-l-xl text-gray-700 font-bold text-xl flex items-center justify-center border-y border-l border-gray-300 transition-colors"
-                                                    >
-                                                        −
-                                                    </button>
-                                                    <input
-                                                        type="number"
-                                                        min="1"
-                                                        value={qty === "" ? "" : qty}
-                                                        onChange={(e) => handleQuantityChange(productId, e.target.value)}
-                                                        className="w-full h-10 text-center border-y border-x-0 border-gray-300 outline-none font-black text-blue-700 bg-white focus:bg-blue-50 text-lg m-0 p-0"
-                                                        style={{ MozAppearance: 'textfield' }}
-                                                    />
-                                                    <button
-                                                        onClick={() => handleIncrement(productId)}
-                                                        className="w-9 h-10 bg-blue-50 hover:bg-blue-100 active:bg-blue-200 rounded-r-xl text-blue-700 font-bold text-xl flex items-center justify-center border-y border-r border-blue-300 transition-colors"
-                                                    >
-                                                        +
-                                                    </button>
+                                                    <div className="flex items-center gap-2 md:gap-3 shrink-0">
+                                                        <div className="flex items-center w-32 shadow-sm rounded-xl">
+                                                            <button
+                                                                onClick={() => handleDecrement(productId)}
+                                                                className="w-9 h-10 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 rounded-l-xl text-gray-700 font-bold text-xl flex items-center justify-center border-y border-l border-gray-300 transition-colors"
+                                                            >
+                                                                −
+                                                            </button>
+                                                            <input
+                                                                type="number"
+                                                                min="1"
+                                                                value={qty === "" ? "" : qty}
+                                                                onChange={(e) => handleQuantityChange(productId, e.target.value)}
+                                                                className="w-full h-10 text-center border-y border-x-0 border-gray-300 outline-none font-black text-blue-700 bg-white focus:bg-blue-50 text-lg m-0 p-0"
+                                                                style={{ MozAppearance: 'textfield' }}
+                                                            />
+                                                            <button
+                                                                onClick={() => handleIncrement(productId)}
+                                                                className="w-9 h-10 bg-blue-50 hover:bg-blue-100 active:bg-blue-200 rounded-r-xl text-blue-700 font-bold text-xl flex items-center justify-center border-y border-r border-blue-300 transition-colors"
+                                                            >
+                                                                +
+                                                            </button>
+                                                        </div>
+
+                                                        <button
+                                                            onClick={() => handleRemoveItem(productId)}
+                                                            title="Remove item from order"
+                                                            className="w-9 h-10 flex items-center justify-center text-red-500 hover:text-red-700 hover:bg-red-50 rounded-xl transition-colors"
+                                                        >
+                                                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                                                <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                            </svg>
+                                                        </button>
+                                                    </div>
                                                 </div>
-
-                                                <button
-                                                    onClick={() => handleRemoveItem(productId)}
-                                                    title="Remove item"
-                                                    className="w-9 h-10 flex items-center justify-center text-red-500 hover:text-red-700 hover:bg-red-50 rounded-xl transition-colors"
-                                                >
-                                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                    </svg>
-                                                </button>
-                                            </div>
+                                            )}
                                         </div>
                                     );
                                 })
@@ -435,7 +609,10 @@ export default function OrdersPage() {
                         {/* Modal Footer */}
                         <div className="p-4 px-6 border-t border-gray-100 bg-gray-50 flex items-center justify-between gap-4">
                             <button
-                                onClick={() => setIsEditModalOpen(false)}
+                                onClick={() => {
+                                    setIsEditModalOpen(false);
+                                    setEditingProductId(null);
+                                }}
                                 className="px-5 py-2 rounded-full border border-gray-300 font-bold text-gray-700 hover:bg-gray-100 transition-colors text-sm md:text-base"
                             >
                                 Done Editing
@@ -443,6 +620,7 @@ export default function OrdersPage() {
                             <button
                                 onClick={() => {
                                     setIsEditModalOpen(false);
+                                    setEditingProductId(null);
                                     exportAsImage();
                                 }}
                                 disabled={selectedCount === 0}
@@ -507,4 +685,5 @@ export default function OrdersPage() {
         </div>
     );
 }
+
 
