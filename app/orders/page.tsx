@@ -26,6 +26,16 @@ export default function OrdersPage() {
         unit: "unit",
     });
 
+    const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
+    const [newProductForm, setNewProductForm] = useState({
+        name: "",
+        category: "Stationary",
+        unit: "KG",
+        retailRate: "",
+        wholesaleRate: "",
+        orderQuantity: 1,
+    });
+
     // State to hold quantities: Record<productId, quantity>
     const [orderMap, setOrderMap] = useState<Record<string, number | "">>({});
 
@@ -148,6 +158,61 @@ export default function OrdersPage() {
         }
     };
 
+    // Create new product in inventory & select for active order
+    const handleCreateAndSelectProduct = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!newProductForm.name.trim()) {
+            alert("Product name is required.");
+            return;
+        }
+
+        try {
+            const res = await fetch("/api/products", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    name: newProductForm.name.trim(),
+                    category: newProductForm.category.trim(),
+                    unit: newProductForm.unit.trim() || "unit",
+                    retailRate: newProductForm.retailRate,
+                    wholesaleRate: newProductForm.wholesaleRate,
+                }),
+            });
+
+            const data = await res.json();
+            if (res.ok && data.insertedId) {
+                // Refetch products list to include new item
+                const fetchRes = await fetch("/api/products");
+                const updatedProducts = await fetchRes.json();
+                setProducts(updatedProducts);
+
+                // Auto select newly created product
+                const newId = String(data.insertedId);
+                const initialQty = Math.max(1, Number(newProductForm.orderQuantity) || 1);
+                setOrderMap((prev) => ({
+                    ...prev,
+                    [newId]: initialQty,
+                }));
+
+                // Reset & close modal
+                setNewProductForm({
+                    name: "",
+                    category: "Stationary",
+                    unit: "KG",
+                    retailRate: "",
+                    wholesaleRate: "",
+                    orderQuantity: 1,
+                });
+                setIsAddProductModalOpen(false);
+            } else {
+                alert("Failed to save product to inventory.");
+            }
+        } catch (error) {
+            console.error("Error creating product:", error);
+            alert("An error occurred while saving product.");
+        }
+    };
+
     const exportAsImage = async () => {
         const selectedProductIds = Object.keys(orderMap);
         if (selectedProductIds.length === 0) {
@@ -219,10 +284,17 @@ export default function OrdersPage() {
                         <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-gray-900">
                             Order Creator
                         </h1>
-                        <p className="text-gray-500 mt-2 text-lg">Select items, edit product details, and define quantities to build your order sheet.</p>
+                        <p className="text-gray-500 mt-2 text-lg">Select items, edit details, or add new items to build your order sheet.</p>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-3 shrink-0">
+                        <button
+                            onClick={() => setIsAddProductModalOpen(true)}
+                            className="bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-lg py-3 px-6 rounded-full transition-colors shadow-md shadow-emerald-500/20 flex items-center justify-center gap-2 shrink-0"
+                        >
+                            <span>➕</span>
+                            Add New Item
+                        </button>
                         {selectedCount > 0 && (
                             <button
                                 onClick={() => setIsEditModalOpen(true)}
@@ -291,7 +363,7 @@ export default function OrdersPage() {
                         <div className="text-center py-16">
                             <div className="text-gray-400 mb-2 text-5xl">📋</div>
                             <h3 className="text-xl font-semibold text-gray-600">No active stock</h3>
-                            <p className="text-gray-400 mt-1">Add items globally in the Inventory tab first.</p>
+                            <p className="text-gray-400 mt-1">Add items globally in the Inventory tab or click Add New Item above.</p>
                         </div>
                     ) : filteredProducts.length === 0 ? (
                         <div className="text-center py-16">
@@ -425,6 +497,120 @@ export default function OrdersPage() {
                     )}
                 </div>
             </div>
+
+            {/* Modal for Adding New Product */}
+            {isAddProductModalOpen && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-3xl max-w-lg w-full shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-150">
+                        {/* Header */}
+                        <div className="p-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/80">
+                            <div>
+                                <h2 className="text-xl font-extrabold text-gray-900 flex items-center gap-2">
+                                    <span>➕</span> Add New Product
+                                </h2>
+                                <p className="text-xs text-gray-500 mt-0.5">Saves item to Inventory and adds it to your active order</p>
+                            </div>
+                            <button
+                                onClick={() => setIsAddProductModalOpen(false)}
+                                className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-200 text-gray-600 hover:bg-gray-300 font-bold transition-colors text-sm"
+                            >
+                                ✕
+                            </button>
+                        </div>
+
+                        {/* Form Body */}
+                        <form onSubmit={handleCreateAndSelectProduct} className="p-5 flex flex-col gap-4">
+                            <div>
+                                <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Product Name *</label>
+                                <input
+                                    type="text"
+                                    required
+                                    placeholder="e.g. Organic Honey / Notebook"
+                                    value={newProductForm.name}
+                                    onChange={(e) => setNewProductForm({ ...newProductForm, name: e.target.value })}
+                                    className="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-base font-semibold"
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Category</label>
+                                    <select
+                                        value={newProductForm.category}
+                                        onChange={(e) => setNewProductForm({ ...newProductForm, category: e.target.value })}
+                                        className="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none font-semibold text-gray-700"
+                                    >
+                                        {baseCategories.map((c) => (
+                                            <option key={c} value={c}>{c}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Unit</label>
+                                    <input
+                                        type="text"
+                                        placeholder="e.g. KG, PCS, Box"
+                                        value={newProductForm.unit}
+                                        onChange={(e) => setNewProductForm({ ...newProductForm, unit: e.target.value })}
+                                        className="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-sm font-semibold"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-3 gap-3">
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Retail Rate (₹)</label>
+                                    <input
+                                        type="number"
+                                        placeholder="0"
+                                        value={newProductForm.retailRate}
+                                        onChange={(e) => setNewProductForm({ ...newProductForm, retailRate: e.target.value })}
+                                        className="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-sm font-semibold"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Wholesale Rate</label>
+                                    <input
+                                        type="number"
+                                        placeholder="0"
+                                        value={newProductForm.wholesaleRate}
+                                        onChange={(e) => setNewProductForm({ ...newProductForm, wholesaleRate: e.target.value })}
+                                        className="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-sm font-semibold"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-blue-600 uppercase mb-1">Order Qty</label>
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        value={newProductForm.orderQuantity}
+                                        onChange={(e) => setNewProductForm({ ...newProductForm, orderQuantity: Math.max(1, parseInt(e.target.value, 10) || 1) })}
+                                        className="w-full bg-blue-50 border border-blue-300 p-3 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-sm font-bold text-blue-700"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Footer Actions */}
+                            <div className="flex items-center justify-end gap-3 mt-3 pt-3 border-t border-gray-100">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsAddProductModalOpen(false)}
+                                    className="px-5 py-2.5 rounded-full border border-gray-300 font-bold text-gray-700 hover:bg-gray-100 transition-colors text-sm"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold px-6 py-2.5 rounded-full transition-colors shadow-md text-sm flex items-center gap-2"
+                                >
+                                    <span>💾</span> Save & Add to Order
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
 
             {/* Floating Action Bar summary */}
             {selectedCount > 0 && (

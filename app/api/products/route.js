@@ -22,13 +22,13 @@ export async function POST(req) {
   const client = await clientPromise;
   const db = client.db("shoperp");
 
-  await db.collection("products").insertOne({
+  const result = await db.collection("products").insertOne({
     name: body.name,
-    wholesaleRate: body.wholesaleRate,
-    retailRate: body.retailRate,
-    category: body.category,
-    unit: body.unit, // e.g. "KG", "Packet", "Piece"
+    wholesaleRate: body.wholesaleRate || "",
+    retailRate: body.retailRate || "",
+    category: body.category || "Stationary",
+    unit: body.unit || "unit",
   });
 
-  return Response.json({ success: true });
+  return Response.json({ success: true, insertedId: result.insertedId });
 }
